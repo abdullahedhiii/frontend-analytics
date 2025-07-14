@@ -28,7 +28,7 @@ CREATE TABLE Restaurant_Owner (
    Account_Password VARCHAR(100) NOT NULL,
    Phone_no VARCHAR(20) NOT NULL 
 );
-ALTER TABLE Restaurant_Owner AUTO_INCREMENT = 1500; -- id starts from 1500
+ALTER TABLE Restaurant_Owner AUTO_INCREMENT = 1500;
 ALTER TABLE Restaurant_Owner MODIFY Phone_no VARCHAR(20) UNIQUE;
 
 
@@ -38,12 +38,12 @@ CREATE TABLE Restaurant (
     OpensAt TIME NOT NULL,
     ClosesAt TIME NOT NULL,
     Restaurant_Image Varchar(50) NOT NULL,
-    Rating DECIMAL(2,1) DEFAULT 5, -- ratings like 4.5,4.7
+    Rating DECIMAL(2,1) DEFAULT 5, 
     Owner_id INT,
     Location_id INT,
-    Menu_id INT DEFAULT NULL -- resta urant created,can be added later
+    Menu_id INT DEFAULT NULL
 );
-ALTER TABLE Restaurant AUTO_INCREMENT = 6500; -- ids start from 6500
+ALTER TABLE Restaurant AUTO_INCREMENT = 6500;
 ALTER TABLE Restaurant ADD COLUMN open_status bool DEFAULT TRUE;
 ALTER TABLE Restaurant ADD COLUMN r_admin INT DEFAULT NULL;
 ALTER TABLE Restaurant ADD CONSTRAINT location_fk FOREIGN KEY(Location_id) REFERENCES Locations(Location_id);
@@ -56,7 +56,7 @@ CREATE TABLE Locations (
     Contact_No VARCHAR(20) NOT NULL
 );
 ALTER TABLE Locations MODIFY Contact_No VARCHAR(20) UNIQUE;
-ALTER TABLE Locations AUTO_INCREMENT = 10100 ; -- ids start from 10100
+ALTER TABLE Locations AUTO_INCREMENT = 10100 ; 
 
 CREATE TABLE Restaurant_Admin (
    Admin_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -140,7 +140,6 @@ CREATE TABLE Orders (
 );
 ALTER TABLE Orders AUTO_INCREMENT = 75638;
 
--- isse status update ka time ajayega display user ko hoga
 ALTER TABLE Orders ADD COLUMN status_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 ALTER TABLE Orders ADD COLUMN promo_id INT DEFAULT NULL;
 ALTER TABLE Orders ADD CONSTRAINT promo_fk foreign key(promo_id) REFERENCES promos(promo_id) ON DELETE SET NULL;
@@ -156,7 +155,7 @@ CREATE TABLE Ordered_Items (
     quantity FLOAT NOT NULL
 );
 
-ALTER TABLE Ordered_Items ADD COLUMN price FLOAT; -- to manage the discounted price!
+ALTER TABLE Ordered_Items ADD COLUMN price FLOAT; 
 
 CREATE TABLE Order_Review(
     Review_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -251,14 +250,12 @@ BEGIN
     FROM Restaurant r
     LEFT JOIN Delivery_Rider dr ON r.Restaurant_id = dr.Restaurant_id
     GROUP BY r.Restaurant_id
-    ORDER BY COUNT(dr.Rider_id) ASC -- Order by the number of riders, ascending
+    ORDER BY COUNT(dr.Rider_id) ASC
     LIMIT 1;
 
-    -- Assign the restaurant ID to the new rider
     IF available_restaurant_id IS NOT NULL THEN
         SET NEW.Restaurant_id = available_restaurant_id;
     ELSE
-        -- Handle the case where no restaurants are available
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No restaurants with available rider slots';
     END IF;
@@ -312,8 +309,7 @@ BEGIN
 
     INSERT INTO DeliveryAddress (Address, phoneNo, nearbyPoint) 
     VALUES (p_Address, tempPhoneNo, p_NearbyPoint); 
--- Bhai y ese nahi ho rha
---    select address_id into tempAddress_id from deliveryAddress where phoneNo = tempPhoneNo;
+
     set tempAddress_id  = LAST_INSERT_ID();
 
     INSERT INTO Orders (Customer_id, Restaurant_id, Address_id, Order_Status)
@@ -329,18 +325,14 @@ END;
 CREATE TRIGGER updateRestaurantRating AFTER UPDATE ON orders
 FOR EACH ROW
 BEGIN
-    -- Declare the variable to hold the average rating
     DECLARE avgRating DECIMAL(2,1);
 
-    -- Check if the review_id has been set (indicating a new review has been added)
     IF NEW.review_id IS NOT NULL AND OLD.review_id IS NULL THEN
-        -- Calculate the average rating for the restaurant based on all reviews of its orders
         SELECT AVG(rating) INTO avgRating
         FROM order_review o
         JOIN orders ord ON o.review_id = ord.review_id
         WHERE ord.restaurant_id = NEW.restaurant_id;
 
-        -- Update the restaurant's rating with the calculated average
         UPDATE Restaurant
         SET Rating = avgRating
         WHERE Restaurant_id = NEW.restaurant_id;
@@ -362,124 +354,3 @@ ALTER TABLE Ordered_Items ADD CONSTRAINT Order_FK FOREIGN KEY(Order_id) REFERENC
 ALTER TABLE Ordered_Items ADD CONSTRAINT Item_FK FOREIGN KEY(Item_id) REFERENCES Menu_Items(Item_id) ON DELETE cascade;
 ALTER TABLE Ordered_Items ADD CONSTRAINT comp_PK PRIMARY KEY(Order_id,Item_id);
 
-
------------------------------ testing queries
-
-select o.order_id,o.order_status,r.restaurant_name,o.customer_id,DATE(o.order_time) AS order_date, 
-TIME(o.order_time) AS order_time,i.item_id,i.dish_name,oo.quantity,i.item_price * oo.quantity AS extended_total
-from orders o join restaurant r
-on o.restaurant_id = r.restaurant_id
-join menu_items i on i.menu_id = r.menu_id
-join ordered_items oo on i.item_id = oo.item_id
-where o.customer_id = 99191
-order by order_date DESC;
-      
-SELECT d.rider_id,d.rider_name,d.available from delivery_rider d
-join restaurant r on d.restaurant_id = d.restaurant_id
-where r.location_id = 10112 and d.Available = true;
-       
-       
-SELECT r.rider_id,r.rider_name,d.address
-from orders o join deliveryaddress d
-on o.address_id = d.address_id
-join delivery_rider r on r.rider_id = o.delivered_by_id
-where order_id = 75639;
-               
-SELECT * from restaurant r
-join locations l
-on r.location_id = l.location_id
-where r.restaurant_id = 6507;
-
-
-SELECT DISTINCT r1.menu_id
-FROM Restaurant r1
-JOIN Restaurant r2
-ON r1.restaurant_name = r2.restaurant_name
-AND r1.owner_id = r2.owner_id
-WHERE r1.restaurant_id <> r2.restaurant_id;
-
-SELECT o.order_id,r.restaurant_name,r.restaurant_id
-from orders o join customer c on o.customer_id = c.customer_id
-join restaurant r on o.restaurant_id = r.restaurant_id
-where c.customer_id = 99191 and o.review_id is null
-order by o.order_time
-LIMIT 1;
-
-delete from restaurant_admin;
-
-select * from customer;
-select * from delivery_rider;
-select * from restaurant_owner;
-delete from customer;
-Select * from restaurant;
-select * from menu_items;
-select * from menu;
-delete from menu_items where Item_id= 18032;
-delete  from restaurant;
-delete from locations;
-delete from locations where location_id = 10101;
-delete from menu_items;
-select * from customer;
-select * from delivery_rider;
-delete from delivery_rider;
-drop table delivery_rider;
-delete from locations where location_id = 10105;
-select * from orders;
-select * from ordered_items;
-delete from orders;
-delete from ordered_items;
-delete from deliveryaddress;
-select *  from deliveryaddress;
-delete from restaurant_owner;
-delete from restaurant_admin;
-select * from deliveryaddress;
-delete from orders;
-delete from customer;
-delete from delivery_rider;
-select * from promos;
-delete from promos;
-select * from locations;
-select * from restaurant;
-delete from restaurant;
-select * from discount;
-select * from Promos;
-
-
-SELECT 
-        o.order_id,
-        o.order_status,
-        d.address,
-        r.restaurant_name,
-        o.customer_id,
-        o.review_id,
-        DATE(o.order_time) AS order_date, 
-        o.total_amount,
-        TIME(o.order_time) AS order_time,
-        i.dish_name,  -- Dish name from menu_items
-        oo.item_id,
-        oo.quantity,
-        oo.price,  -- Price from ordered_items
-        oo.price * oo.quantity AS sub_total -- Calculate sub_total using item_price from ordered_items
-      FROM orders o 
-      JOIN deliveryaddress d ON o.address_id = d.address_id
-      JOIN restaurant r ON o.restaurant_id = r.restaurant_id
-      JOIN ordered_items oo ON o.order_id = oo.order_id        
-      JOIN menu_items i ON oo.item_id = i.item_id  -- Join with menu_items to get dish_name
-      WHERE o.customer_id = 99196
-      ORDER BY order_date DESC;
-
-    ;
-    
-    select * from ordered_items;
-    
-     select oo.item_id,count(oo.order_id)
-     from ordered_items oo
-     join orders o on oo.order_id = o.order_id
-     where restaurant_id = 6500
-     group by oo.item_id
-     having count(oo.order_id) > 0; 
-     
-     select * from orders;
-     select * from ordered_items;
-     delete from orders;
-     delete from ordered_items where order_id <> 75643 or order_id <>75645;

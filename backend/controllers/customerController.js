@@ -4,7 +4,7 @@ const {sendOrderNotification,sendCancellationEmail,sendStatusEmail} = require('.
 module.exports.notifyDispatch = (req,res) => {
     const {customer_email,rider_email} = req.body;
     console.log(customer_email,rider_email,req.body);
-    sendStatusEmail(customer_email,rider_email,req.body);
+    // sendStatusEmail(customer_email,rider_email,req.body);
     return res.status(200).json({message : 'email sent'});
 }
 
@@ -263,7 +263,7 @@ module.exports.PlaceOrder = (req, res) => {
                                         riderTip : riderTip
 
                                     }
-                                    sendOrderNotification(Email,order)
+                                    // sendOrderNotification(Email,order)
                                     return res.status(200).json({ success: true, message: 'Order placed successfully' });
                                 });
                             }
@@ -293,7 +293,7 @@ module.exports.cancelOrder = (req, res) => {
             customerName:Name,
             id : order_id
         }
-        sendCancellationEmail(Email,order)
+        // sendCancellationEmail(Email,order)
         res.status(200).json({message : "Order cancelled"});
     });
 }
