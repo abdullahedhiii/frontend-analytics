@@ -202,6 +202,34 @@ const UserContextProvider = ({ children }) => {
     })
   }
 
+
+
+  const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentRestaurant, setCurrentRestaurant] = useState(null); 
+  const fetchRestaurants = async () => {
+    try {
+      const response = await axios.get("/api/ownedRestaurants", {
+        params: { owner_id: userData.User_id },
+      });
+      setRestaurants(response.data.ownedRestaurants);
+      setError(null);
+    } catch (err) {
+      console.error("Error:", err.response?.data);
+      setError(err.response?.data?.message || "Failed to fetch restaurants");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+   const [adminData, setAdminData] = useState({
+    Admin_Name: "",
+    Email_address: "",
+    Account_Password: "",
+    Phone_no: "",
+  });
+
   return (
     <UserContext.Provider
       value={{
@@ -220,7 +248,13 @@ const UserContextProvider = ({ children }) => {
         getRestaurantOrders,
         restaurantOrders,
         setRestaurantOrders,
-        setPastOrders
+        setPastOrders,
+        restaurants, setRestaurants,
+        loading, setLoading,
+        error, setError,
+        fetchRestaurants,
+        currentRestaurant, setCurrentRestaurant,
+        adminData, setAdminData
       }}
     >
       {children}

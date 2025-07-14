@@ -10,40 +10,41 @@ import {
   ChevronRight,
   Info
 } from "lucide-react";
-import { useUserContext } from "../contexts/userContext";
 import { useNavigate } from "react-router-dom";
 import AddRestaurantPopup from "../components/AddRestaurant";
 import ManageRestaurant from "../components/ManageRestaurant"; // Import ManageRestaurant
 import { useAlertContext } from "../contexts/alertContext";
 import { StatsPopup } from "../components/StatsPopup";
+import { useUserContext } from "../contexts/userContext";
+
 const OwnedRestaurants = () => {
   const { setAlert } = useAlertContext();
-
-  const [restaurants, setRestaurants] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {fetchRestaurants,restaurants,setRestaurants,loading, setLoading,error, setError,currentRestaurant, setCurrentRestaurant} = useUserContext();
+  // const [restaurants, setRestaurants] = useState([]);
+  // const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [isManageOpen, setIsManageOpen] = useState(false); // State to handle ManageRestaurant pop-up
-  const [currentRestaurant, setCurrentRestaurant] = useState(null); // Store current restaurant data
+  const [isManageOpen, setIsManageOpen] = useState(false); 
+  // const [currentRestaurant, setCurrentRestaurant] = useState(null); // Store current restaurant data
   const { loggedIn, userData } = useUserContext();
   const [statisticPopup,setIsStatsOpen] = useState(false);
 
   const navigate = useNavigate();
 
-  const fetchRestaurants = async () => {
-    try {
-      const response = await axios.get("/api/ownedRestaurants", {
-        params: { owner_id: userData.User_id },
-      });
-      setRestaurants(response.data.ownedRestaurants);
-      setError(null);
-    } catch (err) {
-      console.error("Error:", err.response?.data);
-      setError(err.response?.data?.message || "Failed to fetch restaurants");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const fetchRestaurants = async () => {
+  //   try {
+  //     const response = await axios.get("/api/ownedRestaurants", {
+  //       params: { owner_id: userData.User_id },
+  //     });
+  //     setRestaurants(response.data.ownedRestaurants);
+  //     setError(null);
+  //   } catch (err) {
+  //     console.error("Error:", err.response?.data);
+  //     setError(err.response?.data?.message || "Failed to fetch restaurants");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const [deleteRestaurantpop, setDeleteRestaurantPop] = useState(false);
   const [restaurantToDelete, setToDelete] = useState(null);
@@ -283,7 +284,7 @@ const OwnedRestaurants = () => {
             isOpen={isManageOpen}
             onClose={() => setIsManageOpen(false)}
             restaurant={currentRestaurant}
-            fetchRestaurants={fetchRestaurants}
+            // fetchRestaurants={fetchRestaurants}
           />
         )}
       </div>

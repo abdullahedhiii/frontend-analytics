@@ -11,26 +11,13 @@ import Menu from './components/Menu';  // Your menu component
 import 'bootstrap/dist/css/bootstrap.min.css';
 import RiderDashboard from "./views/rider/RiderDashboard";
 import AdminDashboard from './views/AdminDashboard';
+import { ChangePicture } from './components/ManageRestaurantPages/ChangePicture';
+import { TimingChange } from './components/ManageRestaurantPages/TimingChange';
+import { LocationChange } from './components/ManageRestaurantPages/LocationChange';
+import { AddItem } from './components/ManageRestaurantPages/AddItem';
+import { UpdateAdmin } from './components/ManageRestaurantPages/UpdateAdmin';
+import { UpdateMenu } from './components/ManageRestaurantPages/UpdateMenu';
 
-
-// const router = createBrowserRouter([
-//    {
-//        path: "/",
-//        element: <Home/>
-//    },
-//    {
-//        path :"/register",
-//        element: <Register/>
-//    },
-//    {
-//       path : "/login",
-//       element : <Login/>
-//    },
-//    {
-//       path : "/restaurants",
-//       element : <Restaurants/>
-//    }
-// ]);
 
 const Layout = () =>{
    return(
@@ -53,6 +40,14 @@ const router = createBrowserRouter(
        <Route path ='menu/:restaurant_name/:restaurant_id' element = {<Menu/>}/>
        <Route path= 'RiderDashboard' element = {<RiderDashboard/>} />
        <Route path= 'AdminDashboard' element = {<AdminDashboard/>} />
+       <Route path= 'manageRestaurant/picture' element = {<ChangePicture/>} />
+       <Route path= 'manageRestaurant/timings' element = {<TimingChange/>} />
+       <Route path= 'manageRestaurant/locations' element = {<LocationChange/>} />
+       <Route path= 'manageRestaurant/additem' element = {<AddItem/>} />
+       <Route path= 'manageRestaurant/admin' element = {<UpdateAdmin/>} />
+       <Route path= 'manageRestaurant/menu' element = {<UpdateMenu/>} />
+
+       <Route path='*' element={<h1>404 Not Found</h1>} />
      </Route>
    ),
  );
